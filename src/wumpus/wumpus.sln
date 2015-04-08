@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.22609.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wumpus.Model", "Wumpus.Model\Wumpus.Model.csproj", "{22898367-D6F5-45C8-A100-A6C17E6E4D1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wumpus.View", "Wumpus.View\Wumpus.View.csproj", "{1668CA39-8B5F-4D32-A696-2064C4BF4E95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wumpus.Console", "Wumpus.Console\Wumpus.Console.csproj", "{A96F14EC-392E-445A-93C2-EFD502D3BA53}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{22898367-D6F5-45C8-A100-A6C17E6E4D1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22898367-D6F5-45C8-A100-A6C17E6E4D1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22898367-D6F5-45C8-A100-A6C17E6E4D1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22898367-D6F5-45C8-A100-A6C17E6E4D1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1668CA39-8B5F-4D32-A696-2064C4BF4E95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1668CA39-8B5F-4D32-A696-2064C4BF4E95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1668CA39-8B5F-4D32-A696-2064C4BF4E95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1668CA39-8B5F-4D32-A696-2064C4BF4E95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A96F14EC-392E-445A-93C2-EFD502D3BA53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A96F14EC-392E-445A-93C2-EFD502D3BA53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A96F14EC-392E-445A-93C2-EFD502D3BA53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A96F14EC-392E-445A-93C2-EFD502D3BA53}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
