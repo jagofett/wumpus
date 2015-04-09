@@ -12,9 +12,10 @@ namespace Wumpus.Model.Logic
     public class WumpusGameLogic
     {
 	    public WumpusSetting Setting { get; private set; }
-
 	    public Tuple<int,int> PlayerCord { get; private set; }
 	    public int PlayerArrows { get; private set; }
+	    public int PlayerPoints { get; private set; }
+
 
 	    private List<WumpusField> _cave;
 
@@ -26,36 +27,44 @@ namespace Wumpus.Model.Logic
 		{
 			Setting = setting;
 			IsStarted = false;
-
-
-
 		}
 
 	    public void StartGame()
 	    {
 			PlayerArrows = Setting.ArrowNumber;
+		    PlayerPoints = 1000;
 
 			//player start at left bottom
 			PlayerCord = new Tuple<int, int>(0, 0);
-
 			//init the cave, with empty fields
 			InitEmptyCave();
-			_cave.First(x => x.Coordinates.Equals(PlayerCord)).FieldType = FieldType.Player;
+			//set start pos to player
+		    var startPos = _cave.First(x => x.Coordinates.Equals(PlayerCord));
+			startPos.FieldType = FieldType.Player;
+		    startPos.Visible = true;
 
 			//crete the traps
 			CreateTraps();
-
 			//create the wumpus
 			CreateWumpus();
-
 			//create the gold
 			CreateGold();
-
-
 			//set senses
 			CreateSenses();
-
 		    IsStarted = true;
+	    }
+		/// <summary>
+		/// Gets the <see cref="WumpusField"/> with the specified x and y.
+		/// </summary>
+		/// <value>
+		/// The <see cref="WumpusField"/>.
+		/// </value>
+		/// <param name="x">The i.</param>
+		/// <param name="y">The j.</param>
+		/// <returns></returns>
+		public WumpusField this[int x, int y]
+	    {
+		    get { return _cave?.FirstOrDefault(f => f.Coordinates.Equals(new Pair(x, y))); }
 	    }
 
 	    private void CreateSenses()
@@ -170,6 +179,51 @@ namespace Wumpus.Model.Logic
 		    }
 
 	    }
+
+	    public bool Step(Direction direction)
+	    {
+		    if (!IsStarted) return false;
+		    var goalPos = PlayerCord;
+		    switch (direction)
+		    {
+				case Direction.Up:
+				    goalPos = new Pair(goalPos.Item1, goalPos.Item2 + 1);
+					break;
+
+				case Direction.Down:
+					goalPos = new Pair(goalPos.Item1, goalPos.Item2 - 1);
+
+					break;
+				case Direction.Left:
+				    goalPos = new Pair(goalPos.Item1 - 1, goalPos.Item2);
+
+					break;
+				case Direction.Right:
+				    goalPos = new Pair(goalPos.Item1 + 1, goalPos.Item2);
+				    break;
+		    }
+		    var dest = _cave.FirstOrDefault(f => f.Coordinates.Equals(goalPos));
+		    if (dest == null)
+		    {
+			    return false;
+		    }
+		    switch (dest.FieldType)
+		    {
+				case FieldType.Gold:
+				case FieldType.Empty:
+					//user can step here
+					break;
+				case FieldType.Wumpus:
+					//game over
+					break;
+				case FieldType.Trap:
+					//game over
+					break;
+
+			}
+
+			return true;
+		}
 
     }
 }

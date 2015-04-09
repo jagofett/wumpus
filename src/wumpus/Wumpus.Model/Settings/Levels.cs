@@ -28,5 +28,26 @@ namespace Wumpus.Model.Settings
 			};
 			return ret;
 		}
+
+		public static int GetSettingCount()
+		{
+			return Properties.Settings.Default.LevelNames.Length;
+		}
+		public static void SetSettings(WumpusSetting settings, int id)
+		{
+			var appSettings = Properties.Settings.Default;
+			if (appSettings.LevelNames.Length < id)
+			{
+				//error, no element with this id
+				return;
+			}
+			appSettings.ArrowNumbers[id] = settings.ArrowNumber;
+			appSettings.TrapNumberTypes[id] =(int) settings.TrapNumberType;
+			appSettings.TrapNumberMax[id] = settings.TrapNumberMax;
+			appSettings.TrapNumberMins[id] = settings.TrapNumberMin;
+			appSettings.Sizes[id] = settings.Size;
+			appSettings.LevelNames[id] = settings.SettingName;
+
+		}
 	}
 }

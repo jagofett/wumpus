@@ -17,4 +17,12 @@ namespace Wumpus.Common.Enums
 		/// </summary>
 		MinMaxNumber = 1
 	}
+
+	public enum Direction
+	{
+		Up,
+		Down,
+		Left,
+		Right
+	}
 }
