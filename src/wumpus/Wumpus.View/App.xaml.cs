@@ -5,6 +5,8 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Wumpus.Model.Logic;
+using Wumpus.Model.Settings;
 
 namespace Wumpus.View
 {
@@ -13,5 +15,14 @@ namespace Wumpus.View
 	/// </summary>
 	public partial class App : Application
 	{
+
+
+
+		protected override void OnStartup(StartupEventArgs e)
+		{
+			//var model = new WumpusGameLogic();
+
+
+		}
 	}
 }

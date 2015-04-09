@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Wumpus.View.ViewModel
 {
-	public class WumpusViewModel
+	public class WumpusViewModel : ViewModelBase
 	{
+
 	}
 }

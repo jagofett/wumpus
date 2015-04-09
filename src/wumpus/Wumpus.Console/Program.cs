@@ -10,6 +10,7 @@ namespace Wumpus.Console
 	{
 		static void Main(string[] args)
 		{
+
 		}
 	}
 }
