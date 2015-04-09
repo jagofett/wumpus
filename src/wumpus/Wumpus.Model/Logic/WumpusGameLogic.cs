@@ -40,7 +40,7 @@ namespace Wumpus.Model.Logic
 			InitEmptyCave();
 			//set start pos to player
 		    var startPos = _cave.First(x => x.Coordinates.Equals(PlayerCord));
-			startPos.FieldType = FieldType.Player;
+			//startPos.FieldType = FieldType.Player;
 		    startPos.Visible = true;
 
 			//crete the traps
@@ -64,7 +64,7 @@ namespace Wumpus.Model.Logic
 		/// <returns></returns>
 		public WumpusField this[int x, int y]
 	    {
-		    get { return _cave?.FirstOrDefault(f => f.Coordinates.Equals(new Pair(x, y))); }
+		    get { return _cave != null ? _cave.FirstOrDefault(f => f.Coordinates.Equals(new Pair(x, y))) : null; }
 	    }
 
 	    private void CreateSenses()
@@ -119,7 +119,7 @@ namespace Wumpus.Model.Logic
 		{
 			if (IsStarted) return;
 			//todo check if no gold created jet
-			_cave.Where(f => f.FieldType == FieldType.Empty)
+            _cave.Where(f => FieldTrapSafe(f.Coordinates) && f.FieldType == FieldType.Empty)
 				.OrderBy(c => Guid.NewGuid())
 				.First()
 				.FieldType = FieldType.Gold;
@@ -162,7 +162,10 @@ namespace Wumpus.Model.Logic
 		{
 			if (IsStarted) return;
 
-			_cave?.Clear();
+		    if (_cave != null)
+		    {
+                _cave.Clear();		        
+		    }
 			_cave = new List<WumpusField>();
 		    for (var i = 0; i < Setting.Size; i++)
 		    {
@@ -207,17 +210,20 @@ namespace Wumpus.Model.Logic
 		    {
 			    return false;
 		    }
+	        PlayerCord = dest.Coordinates;
 		    switch (dest.FieldType)
 		    {
 				case FieldType.Gold:
 				case FieldType.Empty:
 					//user can step here
+		            PlayerPoints--;
+                    //todo trigger success move event
 					break;
 				case FieldType.Wumpus:
-					//game over
-					break;
 				case FieldType.Trap:
-					//game over
+					//game over, trigger type specific game over event 
+                    //todo
+		            PlayerPoints -= 1000;
 					break;
 
 			}
