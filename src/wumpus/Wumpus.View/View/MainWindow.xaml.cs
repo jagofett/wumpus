@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using Wumpus.Model.Logic;
+using Wumpus.Model.Settings;
 
 namespace Wumpus.View.View
 {
@@ -12,7 +13,7 @@ namespace Wumpus.View.View
 		public MainWindow()
 		{
 			InitializeComponent();
-			_model = new WumpusGameLogic();
+			_model = new WumpusGameLogic(Levels.GetSetting(1));
 
 		}
 

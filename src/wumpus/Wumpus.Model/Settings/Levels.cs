@@ -12,7 +12,7 @@ namespace Wumpus.Model.Settings
 		public static WumpusSetting GetSetting(int id)
 		{
 			var appSettings = Properties.Settings.Default;
-			if (appSettings.LevelNames.Length < id)
+			if (id >= appSettings.LevelNames.Length)
 			{
 				//todo hibakezelés
 				id = 0;

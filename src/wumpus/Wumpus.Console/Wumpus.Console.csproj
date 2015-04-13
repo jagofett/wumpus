@@ -47,6 +47,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Wumpus.Common\Wumpus.Common.csproj">
+      <Project>{84740ab1-d7b4-4e2a-9499-537df8678477}</Project>
+      <Name>Wumpus.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Wumpus.Model\Wumpus.Model.csproj">
+      <Project>{22898367-d6f5-45c8-a100-a6c17e6e4d1b}</Project>
+      <Name>Wumpus.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

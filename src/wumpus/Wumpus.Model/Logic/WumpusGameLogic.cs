@@ -30,6 +30,19 @@ namespace Wumpus.Model.Logic
 
         #region Events
 
+
+
+
+        public EventHandler OutOfFieldEvent;
+
+        private void OnOutOfFieldEvent()
+        {
+            if (OutOfFieldEvent != null)
+            {
+                OutOfFieldEvent(this, null);
+            }
+        }
+
         public EventHandler SucceccStepEvent;
 
         private void OnSuccessStepEvent()
@@ -92,31 +105,45 @@ namespace Wumpus.Model.Logic
             IsStarted = true;
         }
         /// <summary>
-        /// Gets the <see cref="WumpusField"/> with the specified x and y.
+        /// Gets the <see cref="WumpusField"/> with the specified x and y. (if visible)
         /// </summary>
         public WumpusField this[int x, int y]
         {
-            get { return _cave != null ? _cave.FirstOrDefault(f => f.Coordinates.Equals(new Pair(x, y))) : null; }
+            get { return this[new Pair(x, y),false]; }
+        }
+
+        /// <summary>
+        /// Get the field info for the given position
+        /// </summary>
+        /// <param name="position">Needed position (int pair)</param>
+        /// <param name="priv">if true, the field will not be need to be visible, otherwise it will</param>
+        /// <returns>WumpusField info</returns>
+        private WumpusField this[Pair position, bool priv = true]
+        {
+            get { return _cave != null ? _cave.FirstOrDefault(f => f.Coordinates.Equals(position) && (priv || f.Visible)) : null; }
         }
 
         public bool Step(Direction direction)
         {
             if (!IsStarted) return false;
+            PlayerPoints--;
 
             var goalPos = DirectionToPair(direction);
 
-            var dest = _cave.FirstOrDefault(f => f.Coordinates.Equals(goalPos));
-            if (dest == null)
+            var destField = this[goalPos];
+            if (destField == null)
             {
+                //out of field
+                OnOutOfFieldEvent();
                 return false;
             }
-            PlayerCord = dest.Coordinates;
-            switch (dest.FieldType)
+            PlayerCord = destField.Coordinates;
+            switch (destField.FieldType)
             {
                 case FieldType.Gold:
                 case FieldType.Empty:
                     //user can step here
-                    PlayerPoints--;
+                    destField.Visible = true;
                     OnSuccessStepEvent();
                     //todo trigger success move event
                     break;
@@ -128,7 +155,7 @@ namespace Wumpus.Model.Logic
                     OnGameOverEvent(new WumpusGameOverEventArgs
                     {
                         IsGameWin = false,
-                        GameOverType = dest.FieldType,
+                        GameOverType = destField.FieldType,
                         Points = PlayerPoints
                     });
                     break;
@@ -141,9 +168,10 @@ namespace Wumpus.Model.Logic
         public bool GrabGold()
         {
             if (!IsStarted) return false;
-
-            var dest = _cave.FirstOrDefault(f => f.Coordinates.Equals(PlayerCord));
-            if (dest == null || dest.FieldType != FieldType.Gold) return false;
+            PlayerPoints--;
+            //get player actual filed
+            var destField = this[PlayerCord];
+            if (destField == null || destField.FieldType != FieldType.Gold) return false;
             //gold is grabbed, player winned the game
             PlayerPoints += 1000;
             OnGameOverEvent(new WumpusGameOverEventArgs
@@ -155,10 +183,47 @@ namespace Wumpus.Model.Logic
             return true;
         }
 
+        public bool ShootArrow(Direction direction)
+        {
+            if (!IsStarted) return false;
+            PlayerPoints--;
+            PlayerArrows--;
+            var goalPos = DirectionToPair(direction);
+            var destField = this[goalPos];
+            var wumpusFound = destField.FieldType == FieldType.Wumpus;
+            while (destField != null && !wumpusFound)
+            {
+                destField = this[DirectionToPair(direction)];
+                wumpusFound = destField != null && destField.FieldType == FieldType.Wumpus;
+            }
+            if (!wumpusFound)
+            {
+                //no wumpus in this direction
+                OnOutOfFieldEvent();
+                return false;
+            }
+            //wumpus killed
+            PlayerPoints += 1000;
+            OnGameOverEvent(new WumpusGameOverEventArgs
+            {
+                Points =  PlayerPoints,
+                IsGameWin = true,
+                GameOverType = FieldType.Wumpus
+            });
+            return true;
+
+        }
+
         #endregion
 
         #region Private methods
 
+        /// <summary>
+        /// Compute the given direction to position. Starting pos is optional, if not provided, actual player position will be used
+        /// </summary>
+        /// <param name="direction">The direction</param>
+        /// <param name="startPos">Optional starting pos. Default is player actual position</param>
+        /// <returns>Computed position - depending on the given direction</returns>
         private Pair DirectionToPair(Direction direction, Pair startPos = null)
         {
             //default start pos is the current player pos.
