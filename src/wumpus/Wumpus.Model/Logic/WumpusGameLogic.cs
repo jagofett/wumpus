@@ -2,18 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 using Wumpus.Common.Enums;
+using Wumpus.Model.Presistence;
 using Wumpus.Model.Settings;
 using Pair = System.Tuple<int, int>;
 
 
 namespace Wumpus.Model.Logic
 {
+	[Serializable]
     public class WumpusGameLogic
     {
         #region private fields
 
-        private List<WumpusField> _cave;
+		[XmlIgnore]
+	    private IWumpusDataAccess _dataAccess;
+
+		[XmlIgnore]
+
+		private List<WumpusField> _cave;
         
         #endregion
 
@@ -26,14 +34,14 @@ namespace Wumpus.Model.Logic
         public bool IsStarted { get; private set; }
 
 
-        #endregion
+		#endregion
 
-        #region Events
-
-
+		#region Events
 
 
-        public EventHandler OutOfFieldEvent;
+
+		[XmlIgnore]
+		public EventHandler OutOfFieldEvent;
 
         private void OnOutOfFieldEvent()
         {
@@ -42,8 +50,9 @@ namespace Wumpus.Model.Logic
                 OutOfFieldEvent(this, null);
             }
         }
+		[XmlIgnore]
 
-        public EventHandler SucceccStepEvent;
+		public EventHandler SucceccStepEvent;
 
         private void OnSuccessStepEvent()
         {
@@ -52,8 +61,9 @@ namespace Wumpus.Model.Logic
                 SucceccStepEvent(this, null);
             }
         }
+		[XmlIgnore]
 
-        public EventHandler<WumpusGameOverEventArgs> GameOverEvent;
+		public EventHandler<WumpusGameOverEventArgs> GameOverEvent;
 
         private void OnGameOverEvent(WumpusGameOverEventArgs args)
         {
@@ -68,10 +78,11 @@ namespace Wumpus.Model.Logic
 
         #region Constructors
 
-	    public WumpusGameLogic() : this(Levels.GetSetting(0))
+	    public WumpusGameLogic() : this(Levels.GetSetting(0), null)
 	    {}
-		public WumpusGameLogic(WumpusSetting setting)
+		public WumpusGameLogic(WumpusSetting setting, IWumpusDataAccess dataAccess)
 		{
+			_dataAccess = dataAccess;
 			Setting = setting;
 			IsStarted = false;
 		}
@@ -367,8 +378,13 @@ namespace Wumpus.Model.Logic
 
         #endregion
 
-
-	   
+	    public void Save(string fileName)
+	    {
+		    if (IsStarted && _dataAccess != null)
+		    {
+			    _dataAccess.Save(fileName, this);
+		    }
+	    }
 
     }
 }

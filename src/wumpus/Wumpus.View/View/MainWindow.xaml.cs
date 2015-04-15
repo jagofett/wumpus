@@ -13,7 +13,7 @@ namespace Wumpus.View.View
 		public MainWindow()
 		{
 			InitializeComponent();
-			_model = new WumpusGameLogic(Levels.GetSetting(1));
+			//_model = new WumpusGameLogic(Levels.GetSetting(1));
 
 		}
 
