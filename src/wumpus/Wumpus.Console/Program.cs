@@ -39,16 +39,27 @@ namespace Wumpus.Console
                                      "1 - Könnyű \n" +
                                      "2 - Közepes \n" +
                                      "3 - Nehéz \n" +
-                                     "0 - kilépés\n");
+                                     "100 - Egyéni \n" +
+									 "0 - kilépés\n");
 
 		    int levelNumber;
             ReadSafeInput(out levelNumber);
-            if (levelNumber == 0) { return;}
+            if (levelNumber <= 0 || levelNumber > 3 && levelNumber != 100) { return;}
 		    //zero indexing
-            levelNumber--;
+	        WumpusSetting level;
+	        if (levelNumber == 100)
+	        {
+		        level = GetCustomSettings();
+	        }
+	        else
+	        {
+				levelNumber--;
+				level = Levels.GetSetting(levelNumber);
+			}
 
-		    var level = Levels.GetSetting(levelNumber);
-            _game = new WumpusGameLogic(level);
+
+
+			_game = new WumpusGameLogic(level);
 
             _game.GameOverEvent += WumpusGameOverEvent;
             _game.OutOfFieldEvent += WumpusOutOfFieldEvent;
@@ -60,23 +71,32 @@ namespace Wumpus.Console
             //System.Console.WriteLine("Csapdák száma: " + game.Setting.TrapNumberMin + ".." + game.Setting.TrapNumberMax);
             WriteSenses();
 		    Game();
-		    System.Console.ReadKey();
+		    //System.Console.ReadKey();
 		}
 
-	    private static void WriteSenses()
+		private static WumpusSetting GetCustomSettings()
+		{
+			
+			return new WumpusSetting();
+		}
+
+		private static void WriteSenses()
 	    {
-            System.Console.WriteLine("Nyílvesszőid száma: " + _game.PlayerArrows);
+            System.Console.WriteLine("\nNyílvesszőid száma: " + _game.PlayerArrows);
 
 
 	        var actPos = _game.PlayerCord;
-	        var senses = _game[actPos.Item1, actPos.Item2].SenseTypes;
+
+			System.Console.WriteLine("A(z) " + actPos.Item1 + (actPos.Item2+1) +"-es szobába érsz");
+
+			var senses = _game[actPos.Item1, actPos.Item2].SenseTypes;
 	        if (senses.Count > 0)
 	        {
-	            System.Console.WriteLine("A szobába belépve az alábbiakat érzékeled:");
+	            System.Console.WriteLine("Az alábbiakat érzékeled:");
 	        }
 	        else
 	        {
-                System.Console.WriteLine("A szobába belépve nem érzékelsz semmit!");	            
+                System.Console.WriteLine("Nem érzékelsz semmit!");	            
 	        }
 	        foreach (var sens in senses)
 	        {
@@ -96,6 +116,7 @@ namespace Wumpus.Console
 	                    break;
 	            }
 	        }
+			System.Console.WriteLine("");
 	    }
 
 	    private static void Game()
@@ -114,6 +135,7 @@ namespace Wumpus.Console
                                      "3 - Arany felvétele\n" +
                                      "0 - Kilépés");
 	        int dirInt;
+
 	        ReadSafeInput(out dirInt);
 	        switch (dirInt)
 	        {
@@ -149,15 +171,17 @@ namespace Wumpus.Console
 	                    Game();
 	                }
                     break;
+				case 0:
+					return;
+					break;
                 default:
-                    return;
+					Game();
+                    break;
 	        }
-
+		    System.Console.WriteLine("");
 	    }
 
-
-
-	    private static Direction? GetDirection(int? dir = null)
+		private static Direction? GetDirection(int? dir = null)
 	    {
             int dirInt;
 	        if (dir == null)

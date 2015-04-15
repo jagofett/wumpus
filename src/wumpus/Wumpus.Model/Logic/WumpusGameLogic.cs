@@ -190,10 +190,10 @@ namespace Wumpus.Model.Logic
             PlayerArrows--;
             var goalPos = DirectionToPair(direction);
             var destField = this[goalPos];
-            var wumpusFound = destField.FieldType == FieldType.Wumpus;
+	        var wumpusFound = destField != null && destField.FieldType == FieldType.Wumpus;
             while (destField != null && !wumpusFound)
             {
-                destField = this[DirectionToPair(direction)];
+	            destField = this[DirectionToPair(direction, destField.Coordinates)];
                 wumpusFound = destField != null && destField.FieldType == FieldType.Wumpus;
             }
             if (!wumpusFound)
