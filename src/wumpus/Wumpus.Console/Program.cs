@@ -18,7 +18,8 @@ namespace Wumpus.Console
 	{
 		private static WumpusFileDataAccess _dataAccess = new WumpusFileDataAccess();
 	    private static WumpusGameLogic _game;
-	    private static WumpusSetting _lastSetting = null;
+	    private static WumpusSetting _lastSetting;
+	    private static bool _lastArrow;
 
 	    private static void ReadSafeInput(out int number)
 	    {
@@ -38,7 +39,7 @@ namespace Wumpus.Console
 
 		private static void NewGame()
 		{
-
+		    _lastArrow = false;
 			System.Console.WriteLine("\n\n Válassz nehézségi szintet: \n" +
 			                         "1 - Könnyű \n" +
 			                         "2 - Közepes \n" +
@@ -74,6 +75,10 @@ namespace Wumpus.Console
 			}
 		    try
 		    {
+		        if (level.Size >= 50)
+		        {
+		            throw new Exception("Hibás méret!");
+		        }
                 SetGame(new WumpusGameLogic(level, _dataAccess));
 		    }
 		    catch (Exception e)
@@ -205,6 +210,7 @@ namespace Wumpus.Console
                 case 24:
 	                var dirArrow = GetDirection(dirInt - 20);
                     if (dirArrow == null) { return; }
+	                _lastArrow = true;
 	                if (!_game.ShootArrow((Direction) dirArrow))
 	                {
 	                    //some error, try to catch.. (game is not running or things like this)
@@ -324,7 +330,8 @@ namespace Wumpus.Console
 
 	    private static void WumpusOutOfFieldEvent(object sender, EventArgs eventArgs)
 	    {
-            System.Console.WriteLine("Koppant a falon!");
+	        System.Console.WriteLine(_lastArrow ? "A nyíl koppant a falon!" : "Koppantál a falon! Erre nincs út!");
+	        _lastArrow = false;
 	        WriteSenses();
             Game();
 	    }
