@@ -32,8 +32,8 @@ namespace Wumpus.Model.Logic
 	    public int PlayerArrows { get; private set; }
 	    public int PlayerPoints { get; private set; }
         public bool IsStarted { get; private set; }
-
-
+	    public bool ShowFieldEnd { get; set; }
+	    public bool  ShowFieldDebug { get; set; }
 		#endregion
 
 		#region Events
@@ -67,10 +67,16 @@ namespace Wumpus.Model.Logic
 
         private void OnGameOverEvent(WumpusGameOverEventArgs args)
         {
+            IsStarted = false;
+            if (ShowFieldEnd)
+            {
+                _cave.ForEach(x => x.Visible = true);
+            }
             if (GameOverEvent != null)
             {
                 GameOverEvent(this, args);
             }
+            
         }
 
         #endregion
@@ -85,6 +91,8 @@ namespace Wumpus.Model.Logic
 			_dataAccess = dataAccess;
 			Setting = setting;
 			IsStarted = false;
+            ShowFieldEnd = true;
+            ShowFieldDebug = false;
 		}
 
         #endregion
@@ -95,6 +103,7 @@ namespace Wumpus.Model.Logic
         {
             PlayerArrows = Setting.ArrowNumber;
             PlayerPoints = 1000;
+
 
             //player start at left bottom
             PlayerCord = new Tuple<int, int>(0, 0);
@@ -120,7 +129,7 @@ namespace Wumpus.Model.Logic
         /// </summary>
         public WumpusField this[int x, int y]
         {
-            get { return this[new Pair(x, y),false]; }
+            get { return this[new Pair(x, y), ShowFieldDebug]; }
         }
 
         /// <summary>
@@ -161,7 +170,7 @@ namespace Wumpus.Model.Logic
                 case FieldType.Wumpus:
                 case FieldType.Trap:
                     //game over, trigger type specific game over event 
-
+                    destField.Visible = true;
                     PlayerPoints -= 1000;
                     OnGameOverEvent(new WumpusGameOverEventArgs
                     {
@@ -196,7 +205,7 @@ namespace Wumpus.Model.Logic
 
         public bool ShootArrow(Direction direction)
         {
-            if (!IsStarted) return false;
+            if (!IsStarted || PlayerArrows <= 0) return false;
             PlayerPoints--;
             PlayerArrows--;
             var goalPos = DirectionToPair(direction);

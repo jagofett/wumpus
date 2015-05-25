@@ -5,9 +5,148 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wumpus.View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Wumpus világ" MinHeight="700" MinWidth="800" Width="850" Height="700">
+    <Window.InputBindings>
+        <KeyBinding Key="Up" Command="{Binding StepCommand}" CommandParameter="0"/>
+        <KeyBinding Key="Down" Command="{Binding StepCommand}" CommandParameter="1"/>
+        <KeyBinding Key="Left" Command="{Binding StepCommand}" CommandParameter="2"/>
+        <KeyBinding Key="Right" Command="{Binding StepCommand}" CommandParameter="3"/>
+    </Window.InputBindings>
+    
     <Grid>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="94,52,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="120"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="Fájl">
+                <!--<MenuItem Header="Mentés" Command="{Binding SaveGameCommand}"/>
+                <MenuItem Header="Betöltés" Command="{Binding LoadGameCommand}"/>
+                <Separator />-->
+                <MenuItem Header="Kilépés" Command="{Binding ExitGameCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Beállítások">
+                <MenuItem Header="Pálya felfedése a végén" IsChecked="{Binding IsShowEndChecked}" Command="{Binding ShowEndCommand}" />
+                <Separator />
+                <MenuItem Header="Debug - pálya megnézése" IsChecked="{Binding IsShowFieldChecked}" Command="{Binding ShowFieldCommand}" />
+            </MenuItem>
+        </Menu>
+        <GroupBox Grid.Row="1" Header="Beállítások">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="155*"/>
+                    <ColumnDefinition Width="180*"/>
+                    <ColumnDefinition Width="155*"/>
+                    <ColumnDefinition Width="155*"/>
+                    <ColumnDefinition Width="155*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Content="Válassz nehézséget!" HorizontalAlignment="Center"   VerticalAlignment="Center" Height="26" Margin="10,3" Width="116" />
+                <ComboBox Grid.Row="1" Grid.Column="0"  HorizontalAlignment="Center"   VerticalAlignment="Center" Width="100" SelectedIndex="{Binding DiffIndex}" Height="22" Margin="8,5">
+                    <ListBoxItem>Könnyű</ListBoxItem>
+                    <ListBoxItem>Közepes</ListBoxItem>
+                    <ListBoxItem>Nehéz</ListBoxItem>
+                </ComboBox>
+                <Label Content="Barlang mérete (n X n)" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Label Content="Íjjak száma" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Label Content="Csapdák min száma" Grid.Column="3" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Label Content="Csapdák max száma" Grid.Column="4" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
+                <TextBox Grid.Row="1"  Grid.Column="1" HorizontalAlignment="Center"  Text="{Binding SelSize}" VerticalAlignment="Center" Width="120" PreviewTextInput="TextToInt" DataObject.Pasting="PastingHandler" Padding="5,0,0,0"/>
+                <TextBox Grid.Row="1"  Grid.Column="2" HorizontalAlignment="Center"  Text="{Binding SelArrow}" VerticalAlignment="Center" Width="120" PreviewTextInput="TextToInt" DataObject.Pasting="PastingHandler" Padding="5,0,0,0"/>
+                <TextBox Grid.Row="1"  Grid.Column="3" HorizontalAlignment="Center"  Text="{Binding SelMinTrap}" VerticalAlignment="Center" Width="120" PreviewTextInput="TextToInt" DataObject.Pasting="PastingHandler" Padding="5,0,0,0"/>
+                <TextBox Grid.Row="1"  Grid.Column="4" HorizontalAlignment="Center"  Text="{Binding SelMaxTrap}" VerticalAlignment="Center" Width="120" PreviewTextInput="TextToInt" DataObject.Pasting="PastingHandler" Padding="5,0,0,0"/>
+                <Button Content="Új játék" Grid.Column="4" HorizontalAlignment="Center"  Grid.Row="2" VerticalAlignment="Center" Padding="5" Command="{Binding StartGameCommand}"  Width="74"/>
+
+            </Grid>
+        </GroupBox>
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Elements}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="{Binding ActSize}" Columns="{Binding ActSize}"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Button Command="{Binding StepCommand}" CommandParameter="{Binding Id}" Content="{Binding Text}" Focusable="false" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  FontSize="12">
+                        <Button.Style>
+                            <!-- gomb stílusa, ahol a színét megadjuk -->
+                            <Style TargetType="Button">
+                                <Style.Triggers>
+                                    <!-- a szín egy adatkötés hatására fog változni -->
+                                    <DataTrigger Binding="{Binding IsEnabled}" Value="True">
+                                        <Setter Property="Background" Value="White" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                        <Setter Property="Background" Value="Gray" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemContainerStyle>
+                <Style>
+                    <Setter Property="Grid.Row" Value="{Binding X}" />
+                    <Setter Property="Grid.Column" Value="{Binding Y}" />
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+        </ItemsControl>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="13*"/>
+                    <ColumnDefinition Width="53*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="{Binding ActPosText}" HorizontalAlignment="Center"  Grid.Row="0" VerticalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" />
+                <Label Content="Elérhető íjjak:" HorizontalAlignment="Left"  Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Grid.ColumnSpan="2" />
+                <Label Content="{Binding ActArrow}" HorizontalAlignment="Center"  Grid.Row="1" Grid.Column="1" VerticalAlignment="Center"/>
+                <Label Content="Érzékek:" HorizontalAlignment="Left"  Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="26" />
+                <Label Content="{Binding ActSenseText}" HorizontalAlignment="Center"  Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" FontSize="12" ScrollViewer.CanContentScroll="True" />
+
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Grid.Column="0"  Content="{Binding ArrowShootText}" FontSize="12" Padding="5" Command="{Binding ShootCommand}"  VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Button Grid.Row="0" Grid.Column="1"  Content="↑" FontSize="30" Command="{Binding StepCommand}" CommandParameter="0"/>
+                <Button Grid.Row="0" Grid.Column="2"  Content="Arany felvétele" FontSize="12" Padding="5" Command="{Binding GrabCommand}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Button Grid.Row="1" Grid.Column="1"  Content="↓" FontSize="30" Command="{Binding StepCommand}" CommandParameter="1"/>
+                <Button Grid.Row="1" Grid.Column="0"  Content="←" FontSize="30" Command="{Binding StepCommand}" CommandParameter="2"/>
+                <Button Grid.Row="1" Grid.Column="2"  Content="→" FontSize="30" Command="{Binding StepCommand}" CommandParameter="3"/>
+
+            </Grid>
+
+        </Grid>
+        <StatusBar Grid.Row="4" >
+            <StatusBarItem HorizontalAlignment="Center" Padding="0" Margin="0">
+                <Label Padding="0,3,0,0" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Content="{Binding Info}"/>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
+
 </Window>

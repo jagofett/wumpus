@@ -48,6 +48,7 @@ namespace Wumpus.Model.Settings
 			appSettings.Sizes[id] = settings.Size;
 			appSettings.LevelNames[id] = settings.SettingName;
 
+            Properties.Settings.Default.Save();
 		}
 	}
 }
