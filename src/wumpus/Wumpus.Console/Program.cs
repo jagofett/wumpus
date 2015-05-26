@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,9 @@ namespace Wumpus.Console
 	{
 		private static WumpusFileDataAccess _dataAccess = new WumpusFileDataAccess();
 	    private static WumpusGameLogic _game;
-	
+	    private static WumpusSetting _lastSetting;
+	    private static bool _lastArrow;
+
 	    private static void ReadSafeInput(out int number)
 	    {
             while (!Int32.TryParse(System.Console.ReadLine(), out number))
@@ -27,7 +30,7 @@ namespace Wumpus.Console
 
 	    private static void Main(string[] args)
 	    {
-	        System.Console.WriteLine("Üdv a wumpus világban! \n \n" +
+	        System.Console.WriteLine("Üdv a Wumpus világban! \n \n" +
 	                                 "A kaland kezdetét veszi, amint belépsz a vérszomjas wumpus barlangjába.\n" +
 	                                 "Célod, hogy megtaláld az egyik szobában elrejtett aranyat, vagy leszámolj a wumpusszal!\n" +
 	                                 "De vigyázz, a barlangban különféle halálos csapdák is vannak, kerüld el őket!");
@@ -37,23 +40,32 @@ namespace Wumpus.Console
 
 		private static void NewGame()
 		{
-
+		    _lastArrow = false;
 			System.Console.WriteLine("\n\n Válassz nehézségi szintet: \n" +
 			                         "1 - Könnyű \n" +
 			                         "2 - Közepes \n" +
 			                         "3 - Nehéz \n" +
 			                         "100 - Egyéni \n" +
+                                     (_lastSetting != null ? "101 - Előző beállítások \n" : "") +
 			                         "0 - kilépés\n");
 
 			int levelNumber;
 			ReadSafeInput(out levelNumber);
-			if (levelNumber <= 0 || levelNumber > 3 && levelNumber != 100)
+			if (levelNumber <= 0 || levelNumber > 3 && levelNumber != 100 && levelNumber != 101)
 			{
 				return;
 			}
+		    if (levelNumber == 101 && _lastSetting == null)
+		    {
+		        return;
+		    }
 			//zero indexing
 			WumpusSetting level;
-			if (levelNumber == 100)
+		    if (levelNumber == 101)
+		    {
+		        level = _lastSetting;
+		    }
+			else if (levelNumber == 100)
 			{
 				level = GetCustomSettings();
 			}
@@ -62,7 +74,20 @@ namespace Wumpus.Console
 				levelNumber--;
 				level = Levels.GetSetting(levelNumber);
 			}
-			SetGame(new WumpusGameLogic(level, _dataAccess));
+		    try
+		    {
+		        if (level.Size >= 50)
+		        {
+		            throw new Exception("Hibás méret!");
+		        }
+                SetGame(new WumpusGameLogic(level, _dataAccess));
+		    }
+		    catch (Exception e)
+		    {
+                Debug.WriteLine(e.Message);
+		        System.Console.WriteLine("Hibás bemenő adatok!");
+                NewGame();
+		    }
 		}
 		private static void SetGame(WumpusGameLogic game)
 		{
@@ -77,6 +102,7 @@ namespace Wumpus.Console
 				_game.StartGame();
 				System.Console.WriteLine("\n\nBeléptél a barlangba, a bal alsó sarkában vagy.\n" +
 										 "A barlang mérete: " + _game.Setting.Size + " x " + _game.Setting.Size);
+                _lastSetting = _game.Setting;
 			}
 			//System.Console.WriteLine("Csapdák száma: " + game.Setting.TrapNumberMin + ".." + game.Setting.TrapNumberMax);
 			WriteSenses();
@@ -86,7 +112,25 @@ namespace Wumpus.Console
 
 		private static WumpusSetting GetCustomSettings()
 		{
-			return new WumpusSetting();
+            int size, arrows, minTraps, maxTraps;
+            System.Console.WriteLine("Barlang mérete:");
+            ReadSafeInput(out size);
+            System.Console.WriteLine("Nyílvesszők száma:");
+            ReadSafeInput(out arrows);
+            System.Console.WriteLine("Csapdák minimális száma:");
+            ReadSafeInput(out minTraps);
+            System.Console.WriteLine("Csapdák maximális száma:");
+            ReadSafeInput(out maxTraps);
+
+
+			return new WumpusSetting
+			{
+			    Size = size,
+                ArrowNumber = arrows,
+                TrapNumberType = TrapNumberType.MinMaxNumber,
+                TrapNumberMin = minTraps,
+                TrapNumberMax = maxTraps
+			};
 		}
 
 		private static void WriteSenses()
@@ -142,8 +186,8 @@ namespace Wumpus.Console
                                      "\t23 - Jobbra\n" +
                                      "\t24 - Balra\n" +
                                      "3 - Arany felvétele\n" +
-                                     "4 - Mentés\n" +
-                                     "5 - Betöltés\n" +
+                                     //"4 - Mentés\n" +
+                                     //"5 - Betöltés\n" +
 									 "0 - Kilépés");
 	        int dirInt;
 
@@ -167,8 +211,8 @@ namespace Wumpus.Console
                 case 24:
 	                var dirArrow = GetDirection(dirInt - 20);
                     if (dirArrow == null) { return; }
-	                if (!
-                        _game.ShootArrow((Direction) dirArrow))
+	                _lastArrow = true;
+	                if (!_game.ShootArrow((Direction) dirArrow))
 	                {
 	                    //some error, try to catch.. (game is not running or things like this)
 	                }
@@ -226,6 +270,28 @@ namespace Wumpus.Console
 				        Game();
 			        }
 			        break;
+
+                //case 5:
+                //    //load
+                //    System.Console.WriteLine("\nAdd meg a fájl nevét: ");
+                //    var loadFileName = System.Console.ReadLine();
+                //    if (!String.IsNullOrWhiteSpace(loadFileName) && File.Exists(loadFileName))
+                //    {
+                //        try
+                //        {
+                //            SetGame(_dataAccess.LoadGame(loadFileName));
+                //        }
+                //        catch (Exception e)
+                //        {
+                //            System.Console.WriteLine("Sikertelen mentés: " + e.Message);
+                //            Game();
+                //        }
+                //    }
+                //    else
+                //    {
+                //        Game();
+                //    }
+                //    break;
 
 
 
@@ -289,7 +355,8 @@ namespace Wumpus.Console
 
 	    private static void WumpusOutOfFieldEvent(object sender, EventArgs eventArgs)
 	    {
-            System.Console.WriteLine("Koppant a falon!");
+	        System.Console.WriteLine(_lastArrow ? "A nyíl koppant a falon!" : "Koppantál a falon! Erre nincs út!");
+	        _lastArrow = false;
 	        WriteSenses();
             Game();
 	    }

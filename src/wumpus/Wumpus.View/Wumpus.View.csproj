@@ -63,6 +63,7 @@
     </Compile>
     <Compile Include="ViewModel\DelegateCommand.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
+    <Compile Include="ViewModel\WumpusElement.cs" />
     <Compile Include="ViewModel\WumpusViewModel.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
