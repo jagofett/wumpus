@@ -9,6 +9,7 @@ using Wumpus.Common.Enums;
 using Wumpus.Model.Logic;
 using Wumpus.Model.Presistence;
 using Wumpus.Model.Settings;
+using Wumpus.Toplist;
 using Pair = System.Tuple<int, int>;
 
 namespace Wumpus.Console
@@ -17,7 +18,7 @@ namespace Wumpus.Console
 	{
 		private static WumpusFileDataAccess _dataAccess = new WumpusFileDataAccess();
 	    private static WumpusGameLogic _game;
-
+	
 	    private static void ReadSafeInput(out int number)
 	    {
             while (!Int32.TryParse(System.Console.ReadLine(), out number))
@@ -85,7 +86,6 @@ namespace Wumpus.Console
 
 		private static WumpusSetting GetCustomSettings()
 		{
-			
 			return new WumpusSetting();
 		}
 
@@ -191,6 +191,7 @@ namespace Wumpus.Console
 			        {
 				        try
 				        {
+					        fileName = "./" + fileName;
 							_game.Save(fileName);
 							System.Console.WriteLine("Sikeres mentés! \n");
 						}
@@ -210,11 +211,13 @@ namespace Wumpus.Console
 			        {
 				        try
 				        {
-							SetGame(_dataAccess.LoadGame(loadFileName));
+					        var loadGame = _dataAccess.LoadGame(loadFileName);
+							System.Console.WriteLine("Sikeres betöltés!\n");
+                            SetGame(loadGame);
 						}
 						catch (Exception e)
 				        {
-							System.Console.WriteLine("Sikertelen mentés: " + e.Message);
+							System.Console.WriteLine("Sikertelen betöltés: " + e.Message);
 							Game();
 						}
 			        }
@@ -331,7 +334,10 @@ namespace Wumpus.Console
 	            System.Console.WriteLine("A játéknak vége!\n" +
 	                                     "Pontszámod: " + args.Points);
 	        }
-            NewGame();
+		    System.Console.WriteLine("Add meg a neved:\n");
+		    ToplistManager.AddPlayer(System.Console.ReadLine(), args.Points);
+
+		    NewGame();
 	    }
 	}
 }

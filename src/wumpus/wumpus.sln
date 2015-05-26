@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wumpus.Console", "Wumpus.Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wumpus.Common", "Wumpus.Common\Wumpus.Common.csproj", "{84740AB1-D7B4-4E2A-9499-537DF8678477}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wumpus.Toplist", "Wumpus.Toplist\Wumpus.Toplist.csproj", "{F534BB81-5676-41F0-9E00-92897E69C235}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{84740AB1-D7B4-4E2A-9499-537DF8678477}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84740AB1-D7B4-4E2A-9499-537DF8678477}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84740AB1-D7B4-4E2A-9499-537DF8678477}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F534BB81-5676-41F0-9E00-92897E69C235}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F534BB81-5676-41F0-9E00-92897E69C235}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F534BB81-5676-41F0-9E00-92897E69C235}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F534BB81-5676-41F0-9E00-92897E69C235}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

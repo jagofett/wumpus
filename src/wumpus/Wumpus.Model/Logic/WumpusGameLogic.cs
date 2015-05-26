@@ -11,15 +11,14 @@ using Pair = System.Tuple<int, int>;
 
 namespace Wumpus.Model.Logic
 {
-	[Serializable]
+
     public class WumpusGameLogic
     {
         #region private fields
 
-		[XmlIgnore]
-	    private IWumpusDataAccess _dataAccess;
 
-		[XmlIgnore]
+	    private IWumpusDataAccess _dataAccess;
+	    private bool _isSaving;
 
 		private List<WumpusField> _cave;
         
@@ -28,7 +27,8 @@ namespace Wumpus.Model.Logic
         #region Public fields
 
 	    public WumpusSetting Setting { get; private set; }
-	    public Tuple<int,int> PlayerCord { get; private set; }
+
+		public Tuple<int,int> PlayerCord { get; private set; }
 	    public int PlayerArrows { get; private set; }
 	    public int PlayerPoints { get; private set; }
         public bool IsStarted { get; private set; }
@@ -40,7 +40,7 @@ namespace Wumpus.Model.Logic
 
 
 
-		[XmlIgnore]
+		
 		public EventHandler OutOfFieldEvent;
 
         private void OnOutOfFieldEvent()
@@ -50,7 +50,7 @@ namespace Wumpus.Model.Logic
                 OutOfFieldEvent(this, null);
             }
         }
-		[XmlIgnore]
+
 
 		public EventHandler SucceccStepEvent;
 
@@ -61,7 +61,6 @@ namespace Wumpus.Model.Logic
                 SucceccStepEvent(this, null);
             }
         }
-		[XmlIgnore]
 
 		public EventHandler<WumpusGameOverEventArgs> GameOverEvent;
 
@@ -78,13 +77,14 @@ namespace Wumpus.Model.Logic
 
         #region Constructors
 
-	    public WumpusGameLogic() : this(Levels.GetSetting(0), null)
+	    public WumpusGameLogic(IWumpusDataAccess dataAccess) : this(Levels.GetSetting(0), dataAccess)
 	    {}
 		public WumpusGameLogic(WumpusSetting setting, IWumpusDataAccess dataAccess)
 		{
 			_dataAccess = dataAccess;
 			Setting = setting;
 			IsStarted = false;
+			_isSaving = false;
 		}
 
         #endregion
@@ -131,7 +131,7 @@ namespace Wumpus.Model.Logic
         /// <returns>WumpusField info</returns>
         private WumpusField this[Pair position, bool priv = true]
         {
-            get { return _cave != null ? _cave.FirstOrDefault(f => f.Coordinates.Equals(position) && (priv || f.Visible)) : null; }
+            get { return _cave != null ? _cave.FirstOrDefault(f => f.Coordinates.Equals(position) && (priv || f.Visible || _isSaving)) : null; }
         }
 
         public bool Step(Direction direction)
@@ -382,8 +382,26 @@ namespace Wumpus.Model.Logic
 	    {
 		    if (IsStarted && _dataAccess != null)
 		    {
+			    _isSaving = true;
 			    _dataAccess.Save(fileName, this);
+			    _isSaving = false;
 		    }
+	    }
+
+	    public void Load(WumpusSetting setting, Pair playerCord, int playerArrow, int playerPoint, List<WumpusField> cave,
+		    bool isStarted)
+	    {
+		    Setting = setting;
+		    PlayerCord = playerCord;
+		    PlayerArrows = playerArrow;
+		    PlayerPoints = playerPoint;
+		    if (_cave != null)
+		    {
+			    _cave.Clear();
+		    }
+		    _cave = cave;
+		    IsStarted = isStarted;
+		    _isSaving = false;
 	    }
 
     }

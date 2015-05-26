@@ -56,6 +56,10 @@
       <Project>{22898367-d6f5-45c8-a100-a6c17e6e4d1b}</Project>
       <Name>Wumpus.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Wumpus.Toplist\Wumpus.Toplist.csproj">
+      <Project>{f534bb81-5676-41f0-9e00-92897e69c235}</Project>
+      <Name>Wumpus.Toplist</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
